@@ -1,4 +1,5 @@
 include "turtlebot.inc"
+include "wifi.inc"
 
 define floorplan model
 (
@@ -41,4 +42,12 @@ turtlebot
   pose [ 2.0 2.0 0.0 0.0 ]
   name "turtlebot"
   color "black"
+
+  wifiscanner (
+    name "wifi_adapter"
+
+    pose [ 0 0 0 0 ]
+
+    ctrl "wifi"
+  )
 )
