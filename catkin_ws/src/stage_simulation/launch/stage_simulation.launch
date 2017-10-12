@@ -23,6 +23,8 @@
   <node pkg="tf" type="static_transform_publisher" name="repeater0_tf_pub" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 map      robot_repeater0/odom 90"/>
   <node pkg="tf" type="static_transform_publisher" name="repeater1_tf_pub" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 map      robot_repeater1/odom 90"/>
   <node pkg="tf" type="static_transform_publisher" name="repeater2_tf_pub" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 map      robot_repeater2/odom 90"/>
+  <node pkg="tf" type="static_transform_publisher" name="repeater3_tf_pub" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 map      robot_repeater3/odom 90"/>
+  <node pkg="tf" type="static_transform_publisher" name="repeater4_tf_pub" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 map      robot_repeater4/odom 90"/>
 
   <param name="/use_sim_time" value="true"/>
   <!--  ******************** Stage ********************  -->

@@ -1,6 +1,6 @@
 define wifiscanner_sensor sensor (
   size [ 0.025 0.025 0.025 ]
-  range [ 0 8.0 ]
+  range [ 0 10.0 ]
 
   # needed for stage to close the circle
   fov 362

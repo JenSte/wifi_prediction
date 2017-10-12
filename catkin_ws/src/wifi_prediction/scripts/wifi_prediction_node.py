@@ -174,7 +174,7 @@ if __name__ == '__main__':
         rospy.sleep(0.5) 
 
         fixed = ['repeater0']
-        free = ['repeater1', 'repeater2']
+        free = ['repeater1', 'repeater2', 'repeater3', 'repeater4']
         wifi_prediction = WifiPrediction(fixed, free)
 
         rospy.spin()
