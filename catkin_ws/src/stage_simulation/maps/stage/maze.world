@@ -79,7 +79,7 @@ define repeater position (
 
 repeater (
   name "repeater0"
-  pose [ -10 -12 0 0 ]
+  pose [ 2 10 0 0 ]
   localization "gps"
   localization_origin [ 0 0 0 0 ]
 )
