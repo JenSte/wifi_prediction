@@ -4,6 +4,7 @@ import math
 
 import rospy
 import tf
+import tf.transformations
 
 import geometry_msgs.msg
 import move_base_msgs.msg
@@ -86,6 +87,7 @@ class WifiPrediction(object):
     def __init__(self, fixed_repeaters, free_repeaters):
         self._free_repeaters = free_repeaters
         self._next_drop_point = None
+        self._last_drop_time = -2.0
 
         self._range_checker = RangeChecker(WifiPrediction.FRAME_ID)
 
@@ -111,7 +113,7 @@ class WifiPrediction(object):
     def _reposition_topic_name(self, repeater_name):
         return '/wifis/{}/reposition'.format(repeater_name)
 
-    def _near(self, p1, p2, max_distance=0.5):
+    def _near(self, p1, p2, max_distance=0.3):
         distance = shapely.geometry.Point(p1).distance(shapely.geometry.Point(p2))
         return distance < max_distance
 
@@ -121,26 +123,37 @@ class WifiPrediction(object):
             return
 
         if self._next_drop_point == None:
-            return;
+            return
 
+        # Check if we have reached the point where we want to drop the repeater.
         current_position = (msg.feedback.base_position.pose.position.x, msg.feedback.base_position.pose.position.y)
+        if not self._near(self._next_drop_point, current_position):
+            return
+        
+        # Take the next free repeater and drop it.
+        if not self._free_repeaters:
+            print('no more repeaters to drop')
+            return
 
-        if self._near(self._next_drop_point, current_position):
-            # Take the next free repeater and drop it.
-            if not self._free_repeaters.pop:
-                print('no more repeaters to drop')
-                return
+        repeater = self._free_repeaters.pop(0)
+        self._next_drop_point = None
 
-            repeater = self._free_repeaters.pop(0)
-            self._next_drop_point = None
+        # Calculate a position behind our robot where we will drop the repeater.
+        o = msg.feedback.base_position.pose.orientation
+	(roll, pitch, yaw) = tf.transformations.euler_from_quaternion([o.x, o.y, o.z, o.w])
 
-            point_msg = geometry_msgs.msg.Point();
-            point_msg.x = current_position[0]
-            point_msg.y = current_position[1]
-            point_msg.z = 0.0
-            self._reposition_publishers[repeater].publish(point_msg)
+        drop_distance = 0.5
+        dx = drop_distance * math.cos(yaw)
+        dy = drop_distance * math.sin(yaw)
 
-            self._range_checker.add_scan_topic(self._scan_topic_name(repeater))
+        point_msg = geometry_msgs.msg.Point();
+        point_msg.x = current_position[0] - dx
+        point_msg.y = current_position[1] - dy
+        point_msg.z = 0.0
+        self._reposition_publishers[repeater].publish(point_msg)
+        self._last_drop_time = rospy.get_time()
+
+        self._range_checker.add_scan_topic(self._scan_topic_name(repeater))
  
     def _plan_callback(self, msg):
         if msg.header.frame_id != WifiPrediction.FRAME_ID:
@@ -149,16 +162,52 @@ class WifiPrediction(object):
 
         if self._next_drop_point != None:
             return
+
+        if rospy.get_time() - self._last_drop_time < 1.0:
+            return
         
         path = [(pose.pose.position.x, pose.pose.position.y) for pose in msg.poses]
+        path = self._decimate_path(path)
 
-        # Search for a point that is not in the wifi range any more.
-        for i, point in enumerate(path[:20]):
-            if not self._range_checker.check_point(point):
-                i = max(0, i - 5)
-                self._next_drop_point = path[i]
-                print('next drop point: {}'.format(self._next_drop_point))
-                return
+        # Search for the first point that is not in the wifi range any more.
+        idx = None
+        for i, p in enumerate(path[:6]):
+            if not self._range_checker.check_point(p):
+                idx = i
+                break
+
+        if idx == None:
+            # All points are in the range of the wifi, nothing to do
+            return
+
+        # Drop one step earlier, when we are still in the wifi range.
+        if idx > 0:
+            idx -= 1
+
+        self._next_drop_point = path[idx]
+#        print('next drop point: {}'.format(self._next_drop_point))
+#        print(path)
+
+    def _decimate_path(self, path):
+        if not path:
+            return path
+
+        min_distance = 0.3
+
+        # Start with the first point in the path, it is always taken.
+        result = path[0:1]
+
+        pairs = zip(path[:-1], path[1:])
+        distances = [shapely.geometry.Point(ps[0]).distance(shapely.geometry.Point(ps[1])) for ps in pairs]
+
+        sum_distances = 0.0 # Total distance to the previous taken point
+        for point, distance in zip(path[1:], distances):
+            sum_distances += distance
+            if sum_distances > min_distance:
+                result.append(point)
+                sum_distances = 0.0
+
+        return result
 
 
 if __name__ == '__main__':
