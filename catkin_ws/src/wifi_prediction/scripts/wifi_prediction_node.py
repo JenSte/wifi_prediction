@@ -142,7 +142,7 @@ class WifiPrediction(object):
         o = msg.feedback.base_position.pose.orientation
 	(roll, pitch, yaw) = tf.transformations.euler_from_quaternion([o.x, o.y, o.z, o.w])
 
-        drop_distance = 0.5
+        drop_distance = 0.4
         dx = drop_distance * math.cos(yaw)
         dy = drop_distance * math.sin(yaw)
 
@@ -167,11 +167,12 @@ class WifiPrediction(object):
             return
         
         path = [(pose.pose.position.x, pose.pose.position.y) for pose in msg.poses]
-        path = self._decimate_path(path)
+        path = self._decimate_path(path, 0.2)
+        path = path[:10]
 
         # Search for the first point that is not in the wifi range any more.
         idx = None
-        for i, p in enumerate(path[:6]):
+        for i, p in enumerate(path):
             if not self._range_checker.check_point(p):
                 idx = i
                 break
@@ -188,11 +189,9 @@ class WifiPrediction(object):
 #        print('next drop point: {}'.format(self._next_drop_point))
 #        print(path)
 
-    def _decimate_path(self, path):
+    def _decimate_path(self, path, min_distance):
         if not path:
             return path
-
-        min_distance = 0.3
 
         # Start with the first point in the path, it is always taken.
         result = path[0:1]
