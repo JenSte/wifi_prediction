@@ -26,6 +26,22 @@
   <node pkg="tf" type="static_transform_publisher" name="repeater3_tf_pub" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 map      robot_repeater3/odom 90"/>
   <node pkg="tf" type="static_transform_publisher" name="repeater4_tf_pub" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 map      robot_repeater4/odom 90"/>
 
+  <node name="repeater0" pkg="robot_state_publisher" type="robot_state_publisher">
+    <param name="robot_description" command="$(find xacro)/xacro.py '$(find stage_simulation)/urdf/repeater.urdf.xacro' name:=repeater0"/>
+  </node>
+  <node name="repeater1" pkg="robot_state_publisher" type="robot_state_publisher">
+    <param name="robot_description" command="$(find xacro)/xacro.py '$(find stage_simulation)/urdf/repeater.urdf.xacro' name:=repeater1"/>
+  </node>
+  <node name="repeater2" pkg="robot_state_publisher" type="robot_state_publisher">
+    <param name="robot_description" command="$(find xacro)/xacro.py '$(find stage_simulation)/urdf/repeater.urdf.xacro' name:=repeater2"/>
+  </node>
+  <node name="repeater3" pkg="robot_state_publisher" type="robot_state_publisher">
+    <param name="robot_description" command="$(find xacro)/xacro.py '$(find stage_simulation)/urdf/repeater.urdf.xacro' name:=repeater3"/>
+  </node>
+  <node name="repeater4" pkg="robot_state_publisher" type="robot_state_publisher">
+    <param name="robot_description" command="$(find xacro)/xacro.py '$(find stage_simulation)/urdf/repeater.urdf.xacro' name:=repeater4"/>
+  </node>
+
   <param name="/use_sim_time" value="true"/>
   <!--  ******************** Stage ********************  -->
   <!-- 
@@ -84,5 +100,5 @@
   </include>
 
   <!--  **************** Visualisation ****************  -->
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find stage_simulation)/rviz/robot_navigation.rviz"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find stage_simulation)/rviz/robot_navigation.rviz" output="screen"/>
 </launch>
