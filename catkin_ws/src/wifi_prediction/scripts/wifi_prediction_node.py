@@ -52,8 +52,8 @@ class RangeChecker(object):
                     # without self-intersections.
                     break
 
-            	x = r * math.sin(angle)
-            	y = r * math.cos(angle)
+                x = r * math.cos(angle)
+                y = r * math.sin(angle)
 
                 x += trans[0]
                 y += trans[1]
