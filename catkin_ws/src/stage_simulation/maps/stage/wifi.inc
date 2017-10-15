@@ -10,7 +10,7 @@ define wifiscanner_sensor sensor (
 )
 
 define wifiscanner wifiranger (
-  size [ 0.2 0.2 0.2 ]
+  size [ 0.05 0.05 0.05 ]
   wifiscanner_sensor (
     pose [ 0 0 0 0 ]
   )
