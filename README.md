@@ -1,22 +1,37 @@
-Wifi range prediction using the Stage robot simulator
------------------------------------------------------
+# Wifi range prediction using the Stage robot simulator
 
-Usage:
+This repository contains a simple wifi propagation and
+range estimation algorithm based on the Stage robot
+simulator, and a ROS simulation that keeps a robot
+connected to the network by placing wifi repeaters.
 
-git clone https://github.com/taurob/Stage.git
-cd Stage
-git checkout --track origin/wifi
+## Usage:
+
+After cloning this repository, fetch the dependencies:
+```
+git submodule init
+git submodule update
+```
+
+Build the modified Stage simulator:
+```
+cd stage
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=/opt/stage ..
 make
 make install
 cd ../..
+```
 
-cd src
-git clone https://github.com/taurob/stage_ros.git
-cd ..
-catkin_make -DCMAKE_MODULE_PATH=/opt/stage/lib/cmake/Stage/ stage_ros
+Build the catkin workspace:
+```
+cd catkin_ws
+catkin_make -Dstage_DIR=/opt/stage/lib/cmake/Stage/
+```
 
-export LD_LIBRARY_PATH=/opt/stage/lib/:$LD_LIBRARY_PATH
+Run the simulation:
+```
+source devel/setup.bash
 roslaunch stage_simulation stage_simulation.launch
+```
