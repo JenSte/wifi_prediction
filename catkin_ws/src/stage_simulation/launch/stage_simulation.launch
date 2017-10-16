@@ -101,4 +101,6 @@
 
   <!--  **************** Visualisation ****************  -->
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find stage_simulation)/rviz/robot_navigation.rviz" output="screen"/>
+
+  <node name="wifi_prediction_node" pkg="wifi_prediction" type="wifi_prediction_node.py"/>
 </launch>
