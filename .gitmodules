@@ -1,0 +1,6 @@
+[submodule "stage"]
+	path = stage
+	url = https://github.com/taurob/Stage.git
+[submodule "catkin_ws/src/stage_ros"]
+	path = catkin_ws/src/stage_ros
+	url = https://github.com/taurob/stage_ros.git
